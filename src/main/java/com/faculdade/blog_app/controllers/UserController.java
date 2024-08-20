@@ -1,12 +1,11 @@
 package com.faculdade.blog_app.controllers;
 
-import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
@@ -35,14 +34,10 @@ public class UserController {
     }
   }
 
-  @PostMapping
-  public ResponseEntity<Void> insert(@RequestBody User user) {
+  @PostMapping(value = "/save")
+  public ResponseEntity<User> insert(@RequestBody User user) {
     user = service.save(user);
-    URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-        .path("/{id}")
-        .buildAndExpand(user.getId())
-        .toUri();
-    return ResponseEntity.created(uri).build();
+    return ResponseEntity.ok(user);
   }
 
   @DeleteMapping(value = "/{id}")
@@ -56,13 +51,13 @@ public class UserController {
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<Void> update(@RequestBody User user, @PathVariable Long id) {
+  public ResponseEntity<String> update(@RequestBody User user, @PathVariable Long id) {
     if (service.existsById(id)) {
       user.setId(id);
       service.update(user);
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.ok("Usuario atualizado com sucesso");
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 
@@ -72,27 +67,27 @@ public class UserController {
     if (user != null) {
       return ResponseEntity.ok().body(user.getPosts());
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.noContent().build();
     }
   }
 
   @PostMapping(value = "/{id}/seguir/{seguirId}")
-  public ResponseEntity<Void> followUser(@PathVariable Long id, @PathVariable Long followId) {
+  public ResponseEntity<String> followUser(@PathVariable Long id, @PathVariable Long followId) {
     if (service.existsById(id) && service.existsById(followId)) {
       service.followUser(id, followId);
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.ok("Usuario seguido com sucesso");
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 
   @DeleteMapping(value = "/{id}/deixarDeSeguir/{seguindoId}")
-  public ResponseEntity<Void> unfollowUser(@PathVariable Long id, @PathVariable Long followId) {
+  public ResponseEntity<String> unfollowUser(@PathVariable Long id, @PathVariable Long followId) {
     if (service.existsById(id) && service.existsById(followId)) {
       service.unfollowUser(id, followId);
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.ok("Deixou de seguir o usuario com sucesso");
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 

@@ -50,9 +50,9 @@ public class UserService {
     existingUser.setPassword(newUser.getPassword());
   }
 
-  public void followUser(Long id, Long followId) {
+  public void followUser(Long id, Long followUserId) {
     User user = findById(id);
-    User userToFollow = findById(followId);
+    User userToFollow = findById(followUserId);
     user.getSeguindo().add(userToFollow);
     userToFollow.getSeguidores().add(user);
     save(user);
