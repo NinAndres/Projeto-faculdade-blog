@@ -2,6 +2,7 @@ package com.faculdade.blog_app.entities;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -32,6 +33,7 @@ public class Comment {
     private String content;
 
     @NotNull
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date date;
 
     @ManyToOne

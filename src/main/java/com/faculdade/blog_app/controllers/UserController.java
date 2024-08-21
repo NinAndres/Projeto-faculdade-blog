@@ -1,5 +1,6 @@
 package com.faculdade.blog_app.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class UserController {
     }
   }
 
-  @PostMapping(value = "/{id}/seguir/{seguirId}")
+  @PostMapping(value = "/{id}/seguir/{followId}")
   public ResponseEntity<String> followUser(@PathVariable Long id, @PathVariable Long followId) {
     if (service.existsById(id) && service.existsById(followId)) {
       service.followUser(id, followId);
@@ -81,7 +82,7 @@ public class UserController {
     }
   }
 
-  @DeleteMapping(value = "/{id}/deixarDeSeguir/{seguindoId}")
+  @DeleteMapping(value = "/{id}/deixarDeSeguir/{followId}")
   public ResponseEntity<String> unfollowUser(@PathVariable Long id, @PathVariable Long followId) {
     if (service.existsById(id) && service.existsById(followId)) {
       service.unfollowUser(id, followId);
