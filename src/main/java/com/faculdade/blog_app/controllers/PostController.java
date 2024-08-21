@@ -79,20 +79,19 @@ public class PostController {
       comment.setPost(obj);
       commentRepository.save(comment);
     }
-
     return ResponseEntity.ok(obj);
   }
 
   @PutMapping(value = "/{id}")
-  public ResponseEntity<Void> update(@RequestBody Post obj, @PathVariable Long id) {
+  public ResponseEntity<String> update(@RequestBody Post obj, @PathVariable Long id) {
     obj.setId(id);
     postService.update(obj);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok("Post alterado com sucesso");
   }
 
   @DeleteMapping(value = "/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
+  public ResponseEntity<String> delete(@PathVariable Long id) {
     postService.delete(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok().body("Post deletado com sucesso");
   }
 }

@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.faculdade.blog_app.entities.Author;
+import com.faculdade.blog_app.entities.Comment;
 import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
 import com.faculdade.blog_app.repositories.PostRepository;
@@ -17,6 +19,9 @@ public class PostService {
 
   @Autowired
   private PostRepository repository;
+
+  @Autowired
+  private CommentService commentService;
 
   public Post save(Post post) {
     return repository.save(post);
@@ -32,17 +37,41 @@ public class PostService {
   }
 
   public void delete(Long id) {
-    findById(id);
+    Post post = findById(id);
+    if (post == null) {
+      throw new ObjectNotFoundException("Post não encontrado");
+    }
+
+    Author author = post.getAuthor();
+    if (author != null) {
+      author.getPosts().remove(post);
+    }
+
+    List<Comment> comments = post.getComments();
+    for (Comment comment : comments) {
+      comment.setPost(null);
+      commentService.delete(comment);
+    }
+
+    post.getComments().clear();
+
     repository.deleteById(id);
   }
 
   public Post findById(Long id) {
-    Optional<Post> obj = repository.findById(id);
-    return obj.orElseThrow(() -> new ObjectNotFoundException("Post not found"));
+    Post post = repository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Post not found"));
+    if (post.getUser() != null) {
+      post.getUser().setPassword(null);
+    }
+    return post;
   }
 
   public List<Post> getAll() {
-    return repository.findAll();
+    List<Post> posts = repository.findAll();
+    for (Post post : posts) {
+      post.getUser().setPassword(null);
+    }
+    return posts;
   }
 
   public List<Post> findByTitle(String title) {

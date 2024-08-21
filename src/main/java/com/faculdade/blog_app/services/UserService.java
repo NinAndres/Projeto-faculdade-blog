@@ -1,5 +1,6 @@
 package com.faculdade.blog_app.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +18,16 @@ public class UserService {
   private UserRepository repository;
 
   public List<User> getAll() {
-    return repository.findAll();
+    List<User> usuarios = repository.findAll();
+    for (User user : usuarios) {
+      user.setPassword(null);
+    }
+    return usuarios;
   }
 
   public User findById(Long id) {
     Optional<User> obj = repository.findById(id);
-    return obj.orElseThrow(() -> new ObjectNotFoundException("User not found"));
+    return obj.orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado"));
   }
 
   public User save(User obj) {
@@ -30,7 +35,15 @@ public class UserService {
   }
 
   public void delete(Long id) {
-    findById(id);
+    User user = findById(id);
+    if (user == null) {
+      throw new ObjectNotFoundException("Usuario nao encontrado");
+    }
+    for (User seguidor : user.getSeguidores()) {
+      seguidor.getSeguindo().remove(user);
+    }
+    user.getSeguindo().clear();
+    user.getSeguidores().clear();
     repository.deleteById(id);
   }
 
