@@ -7,5 +7,4 @@ import com.faculdade.blog_app.entities.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
 }

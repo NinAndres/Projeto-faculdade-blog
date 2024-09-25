@@ -1,6 +1,5 @@
 package com.faculdade.blog_app.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
 import com.faculdade.blog_app.services.UserService;
+import com.faculdade.blog_app.services.exception.ObjectNotFoundException;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -26,12 +26,12 @@ public class UserController {
   }
 
   @GetMapping(value = "/{id}")
-  public ResponseEntity<User> findById(@PathVariable Long id) {
-    User user = service.findById(id);
-    if (user != null) {
-      return ResponseEntity.ok().body(user);
-    } else {
-      return ResponseEntity.notFound().build();
+  public ResponseEntity<?> findById(@PathVariable Long id) {
+    try {
+      User user = service.findById(id);
+      return ResponseEntity.status(HttpStatus.OK).body(user);
+    } catch (ObjectNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 
@@ -42,12 +42,12 @@ public class UserController {
   }
 
   @DeleteMapping(value = "/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
+  public ResponseEntity<String> delete(@PathVariable Long id) {
     if (service.existsById(id)) {
       service.delete(id);
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.status(HttpStatus.OK).body("Usuario deletado com sucesso");
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 
@@ -63,12 +63,12 @@ public class UserController {
   }
 
   @GetMapping(value = "/{id}/posts")
-  public ResponseEntity<List<Post>> findPosts(@PathVariable Long id) {
-    User user = service.findById(id);
-    if (user != null) {
+  public ResponseEntity<?> findPosts(@PathVariable Long id) {
+    try {
+      User user = service.findById(id);
       return ResponseEntity.ok().body(user.getPosts());
-    } else {
-      return ResponseEntity.noContent().build();
+    } catch (ObjectNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario nao encontrado");
     }
   }
 

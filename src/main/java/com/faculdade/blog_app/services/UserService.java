@@ -1,6 +1,5 @@
 package com.faculdade.blog_app.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,8 +25,12 @@ public class UserService {
   }
 
   public User findById(Long id) {
-    Optional<User> obj = repository.findById(id);
-    return obj.orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado"));
+    return repository.findById(id)
+        .map(user -> {
+          user.setPassword(null);
+          return user;
+        })
+        .orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado"));
   }
 
   public User save(User obj) {
@@ -39,11 +42,20 @@ public class UserService {
     if (user == null) {
       throw new ObjectNotFoundException("Usuario nao encontrado");
     }
-    for (User seguidor : user.getSeguidores()) {
-      seguidor.getSeguindo().remove(user);
+    if (user.getSeguidores() != null) {
+      for (User seguidor : user.getSeguidores()) {
+        seguidor.getSeguindo().remove(user);
+      }
     }
-    user.getSeguindo().clear();
-    user.getSeguidores().clear();
+
+    if (user.getSeguindo() != null) {
+      user.getSeguindo().clear();
+    }
+
+    if (user.getSeguidores() != null) {
+      user.getSeguidores().clear();
+    }
+
     repository.deleteById(id);
   }
 
@@ -77,5 +89,13 @@ public class UserService {
     user.getSeguindo().remove(userToUnfollow);
     userToUnfollow.getSeguidores().remove(user);
     save(user);
+  }
+
+  public Integer countUserPosts(Long id) {
+    User user = findById(id);
+    if (user == null) {
+      throw new ObjectNotFoundException("Usuario nao encontrado");
+    }
+    return user.getPosts().size();
   }
 }

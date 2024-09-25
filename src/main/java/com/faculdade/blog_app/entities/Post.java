@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +31,7 @@ public class Post {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull
+  @NotNull(message = "A data nao pode ser nula")
   @JsonFormat(pattern = "dd/MM/yyyy")
   private Date date;
 
@@ -40,24 +41,28 @@ public class Post {
   @NotBlank
   private String body;
 
-  @NotNull
+  @NotNull(message = "Usuario nao pode ser nulo")
   @ManyToOne
   private User user;
 
-  @NotNull
+  @NotNull(message = "Author nao pode ser nulo")
   @ManyToOne
   private Author author;
 
-  public Post(Long id, Date date, String title, String body, User user, Author author) {
+  @NotNull(message = "Status nao pode ser nulo")
+  private boolean active;
+
+  public Post(Long id, Date date, String title, String body, User user, Author author, boolean active) {
     this.id = id;
     this.date = date;
     this.title = title;
     this.body = body;
     this.user = user;
     this.author = author;
+    this.active = active;
   }
 
   @Nullable
-  @OneToMany(mappedBy = "post")
+  @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
   private List<Comment> comments = new ArrayList<>();
 }

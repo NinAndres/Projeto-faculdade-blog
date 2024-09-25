@@ -6,7 +6,8 @@ import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
@@ -17,7 +18,8 @@ import com.faculdade.blog_app.repositories.UserRepository;
 import com.faculdade.blog_app.repositories.CommentRepository;
 import com.faculdade.blog_app.repositories.AuthorRepository;
 
-@Configuration
+@Profile("dev")
+@Component
 public class testeConfig implements CommandLineRunner {
 
   @Autowired
@@ -51,8 +53,8 @@ public class testeConfig implements CommandLineRunner {
     authorRepository.saveAll(Arrays.asList(authorMaria, authorAlex));
 
     Post post1 = new Post(null, sdf.parse("21/03/2024"), "Partiu viagem", "Vou viajar para São Paulo. Abraços!", maria,
-        authorMaria);
-    Post post2 = new Post(null, sdf.parse("23/03/2024"), "Bom dia", "Acordei feliz hoje!", alex, authorAlex);
+        authorMaria, true);
+    Post post2 = new Post(null, sdf.parse("23/03/2024"), "Bom dia", "Acordei feliz hoje!", alex, authorAlex, true);
 
     Comment c1 = new Comment(null, "Boa viagem mano!", sdf.parse("21/03/2024"), post1, authorAlex);
     Comment c2 = new Comment(null, "Aproveite", sdf.parse("22/03/2024"), post1, authorMaria);

@@ -32,18 +32,18 @@ public class Comment {
     @NotBlank
     private String content;
 
-    @NotNull
+    @NotNull(message = "Data nao pode ser nula")
     @JsonFormat(pattern = "dd/MM/yyyy")
     private Date date;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    @NotNull
+    @JoinColumn(name = "post_id", nullable = false)
+    @NotNull(message = "Post nao pode ser nulo")
     @JsonIgnore
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @NotNull
+    @NotNull(message = "Author nao pode ser nulo")
     private Author author;
 }

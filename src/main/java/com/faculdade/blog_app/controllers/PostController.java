@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import com.faculdade.blog_app.entities.User;
 import com.faculdade.blog_app.repositories.CommentRepository;
 import com.faculdade.blog_app.services.PostService;
 import com.faculdade.blog_app.services.UserService;
+import com.faculdade.blog_app.services.exception.ObjectNotFoundException;
 import com.faculdade.blog_app.util.URL;
 
 @RestController
@@ -43,8 +45,12 @@ public class PostController {
 
   @GetMapping(value = "/{id}")
   public ResponseEntity<Post> findById(@PathVariable Long id) {
-    Post obj = postService.findById(id);
-    return ResponseEntity.ok().body((obj));
+    try {
+      Post post = postService.findById(id);
+      return ResponseEntity.ok().body(post);
+    } catch (ObjectNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   @GetMapping(value = "/findByTitle")
@@ -70,11 +76,16 @@ public class PostController {
   public ResponseEntity<Post> insert(@RequestBody Post obj) {
     User user = obj.getUser();
     if (user != null) {
-      user = userService.findById(user.getId());
-      obj.setUser(user);
+      try {
+        user = userService.findById(user.getId());
+        obj.setUser(user);
+      } catch (ObjectNotFoundException e) {
+        return ResponseEntity.notFound().build();
+      }
     }
-
+    obj.setActive(true);
     obj = postService.save(obj);
+
     for (Comment comment : obj.getComments()) {
       comment.setPost(obj);
       commentRepository.save(comment);
@@ -91,7 +102,28 @@ public class PostController {
 
   @DeleteMapping(value = "/{id}")
   public ResponseEntity<String> delete(@PathVariable Long id) {
-    postService.delete(id);
-    return ResponseEntity.ok().body("Post deletado com sucesso");
+    if (postService.existsById(id)) {
+      postService.delete(id);
+      return ResponseEntity.ok().body("Post deletado com sucesso");
+    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Post nao encontrado");
+  }
+
+  @GetMapping("/postComMaisComentario/{userId}")
+  public ResponseEntity<List<Post>> getPostsSortedByComments(@PathVariable Long userId) {
+    try {
+      List<Post> sortedPosts = postService.postsOrdenadoPorMaisComments(userId);
+      return ResponseEntity.ok(sortedPosts);
+
+    } catch (ObjectNotFoundException e) {
+      return ResponseEntity.notFound().build();
+    }
+
+  }
+
+  @GetMapping("/status/{active}")
+  public ResponseEntity<List<Post>> getPostsByStatus(@PathVariable boolean active) {
+    List<Post> posts = postService.findByActiveStatus(active);
+    return ResponseEntity.ok(posts);
   }
 }

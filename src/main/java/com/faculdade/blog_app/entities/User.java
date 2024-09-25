@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,10 +33,10 @@ public class User {
 
   @NotBlank
   private String name;
+
   @NotBlank
   private String email;
 
-  @NotBlank
   private String password;
 
   public User(Long id, String name, String email, String password) {
@@ -45,7 +46,7 @@ public class User {
     this.password = password;
   }
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   @JsonIgnore
   private List<Post> posts = new ArrayList<>();
 

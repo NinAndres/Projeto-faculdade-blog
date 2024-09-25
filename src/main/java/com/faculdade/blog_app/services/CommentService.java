@@ -16,8 +16,7 @@ public class CommentService {
     return repository.save(obj);
   }
 
-  public void delete(Comment obj) {
-    repository.delete(obj);
+  public void deleteById(Long id) {
+    repository.deleteById(id);
   }
-
 }

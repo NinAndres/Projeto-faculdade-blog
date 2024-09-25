@@ -1,14 +1,13 @@
 package com.faculdade.blog_app.services;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.faculdade.blog_app.entities.Author;
-import com.faculdade.blog_app.entities.Comment;
 import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
 import com.faculdade.blog_app.repositories.PostRepository;
@@ -21,7 +20,7 @@ public class PostService {
   private PostRepository repository;
 
   @Autowired
-  private CommentService commentService;
+  private UserService userService;
 
   public Post save(Post post) {
     return repository.save(post);
@@ -32,8 +31,13 @@ public class PostService {
     postExists.setTitle(post.getTitle());
     postExists.setBody(post.getBody());
     postExists.setDate(post.getDate());
+    postExists.setActive(post.isActive());
 
     return repository.save(post);
+  }
+
+  public List<Post> findByActiveStatus(boolean active) {
+    return repository.findByActive(active);
   }
 
   public void delete(Long id) {
@@ -41,20 +45,6 @@ public class PostService {
     if (post == null) {
       throw new ObjectNotFoundException("Post não encontrado");
     }
-
-    Author author = post.getAuthor();
-    if (author != null) {
-      author.getPosts().remove(post);
-    }
-
-    List<Comment> comments = post.getComments();
-    for (Comment comment : comments) {
-      comment.setPost(null);
-      commentService.delete(comment);
-    }
-
-    post.getComments().clear();
-
     repository.deleteById(id);
   }
 
@@ -64,6 +54,10 @@ public class PostService {
       post.getUser().setPassword(null);
     }
     return post;
+  }
+
+  public boolean existsById(Long id) {
+    return repository.existsById(id);
   }
 
   public List<Post> getAll() {
@@ -84,6 +78,21 @@ public class PostService {
 
   public List<Post> findByUser(User user) {
     return repository.findByUser(user);
+  }
+
+  public List<Post> postsOrdenadoPorMaisComments(Long userId) {
+    User user = userService.findById(userId);
+
+    List<Post> posts = user.getPosts();
+
+    Collections.sort(posts, new Comparator<Post>() {
+      @Override
+      public int compare(Post p1, Post p2) {
+        return Integer.compare(p2.getComments().size(), p1.getComments().size());
+      }
+    });
+
+    return posts;
   }
 
 }
