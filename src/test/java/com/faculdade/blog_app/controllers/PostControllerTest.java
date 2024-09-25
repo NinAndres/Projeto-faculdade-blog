@@ -176,22 +176,22 @@ public class PostControllerTest {
 
   @Test
   public void testGetPostsByStatusTrue() {
-    when(postService.findByActiveStatus(true)).thenReturn(Arrays.asList(post1));
+    when(postService.findByActiveStatus(true)).thenReturn(Arrays.asList(postAtivo));
 
     ResponseEntity<List<Post>> response = postController.getPostsByStatus(true);
 
     assertEquals(200, response.getStatusCode().value());
     assertEquals(1, response.getBody().size());
-    assertEquals(post1, response.getBody().get(0));
+    assertEquals(postAtivo, response.getBody().get(0));
   }
 
   @Test
   public void testGetPostsByStatusFalse() {
-    when(postService.findByActiveStatus(false)).thenReturn(Arrays.asList(post2));
+    when(postService.findByActiveStatus(false)).thenReturn(Arrays.asList(postInativo));
 
     ResponseEntity<List<Post>> response = postController.getPostsByStatus(false);
     assertEquals(200, response.getStatusCode().value());
     assertEquals(1, response.getBody().size());
-    assertEquals(post2, response.getBody().get(0));
+    assertEquals(postInativo, response.getBody().get(0));
   }
 }

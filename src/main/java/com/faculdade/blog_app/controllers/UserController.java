@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.faculdade.blog_app.entities.Post;
 import com.faculdade.blog_app.entities.User;
 import com.faculdade.blog_app.services.UserService;
 import com.faculdade.blog_app.services.exception.ObjectNotFoundException;
